@@ -80,7 +80,7 @@ class AlertController {
   async triggerSync(req, res) {
     try {
       logger.info('Manual NewsData sync triggered');
-      const result = await newsDataService.syncAllNews();
+      const result = await newsDataService.syncAllNews(true);
       res.json({ success: true, data: result });
     } catch (error) {
       logger.error(`Manual sync failed: ${error.message}`);

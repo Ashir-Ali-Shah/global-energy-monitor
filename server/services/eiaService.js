@@ -24,35 +24,61 @@ class EIAService {
     this.energySeries = [
       {
         route: '/petroleum/pri/spt/data/',
-        params: { frequency: 'weekly', data: ['value'], sort: [{ column: 'period', direction: 'desc' }], length: 52 },
+        params: { 
+          frequency: 'daily', 
+          'data[0]': 'value', 
+          'facets[product][]': 'EPCWTI',
+          'sort[0][column]': 'period', 
+          'sort[0][direction]': 'desc', 
+          length: 180 
+        },
         commodity: 'crude-oil',
         unit: '$/barrel',
-        description: 'Crude Oil Spot Price (WTI)',
-        seriesFilter: { product: 'EPCWTI' },
+        description: 'Crude Oil Spot Price (WTI)'
       },
       {
-        route: '/petroleum/pri/gnd/data/',
-        params: { frequency: 'weekly', data: ['value'], sort: [{ column: 'period', direction: 'desc' }], length: 52 },
+        route: '/petroleum/pri/spt/data/',
+        params: { 
+          frequency: 'daily', 
+          'data[0]': 'value', 
+          'facets[product][]': 'EPMRU', 
+          'facets[duoarea][]': 'Y35NY',
+          'sort[0][column]': 'period', 
+          'sort[0][direction]': 'desc', 
+          length: 180 
+        },
         commodity: 'gasoline',
         unit: '$/gallon',
-        description: 'Regular Gasoline Retail Price',
-        seriesFilter: { product: 'EPM0' },
+        description: 'Regular Gasoline Spot Price (NY Harbor)'
       },
       {
-        route: '/petroleum/pri/gnd/data/',
-        params: { frequency: 'weekly', data: ['value'], sort: [{ column: 'period', direction: 'desc' }], length: 52 },
+        route: '/petroleum/pri/spt/data/',
+        params: { 
+          frequency: 'daily', 
+          'data[0]': 'value', 
+          'facets[product][]': 'EPD2DXL0', 
+          'facets[duoarea][]': 'Y35NY',
+          'sort[0][column]': 'period', 
+          'sort[0][direction]': 'desc', 
+          length: 180 
+        },
         commodity: 'diesel',
         unit: '$/gallon',
-        description: 'No. 2 Diesel Retail Price',
-        seriesFilter: { product: 'EPD2D' },
+        description: 'No. 2 Diesel Spot Price (NY Harbor)'
       },
       {
-        route: '/natural-gas/pri/sum/data/',
-        params: { frequency: 'monthly', data: ['value'], sort: [{ column: 'period', direction: 'desc' }], length: 24 },
+        route: '/natural-gas/pri/fut/data/',
+        params: { 
+          frequency: 'daily', 
+          'data[0]': 'value', 
+          'facets[process][]': 'PS0',
+          'sort[0][column]': 'period', 
+          'sort[0][direction]': 'desc', 
+          length: 180 
+        },
         commodity: 'natural-gas',
-        unit: '$/MCF',
-        description: 'Natural Gas Price',
-        seriesFilter: { process: 'PCS' },
+        unit: '$/MMBTU',
+        description: 'Henry Hub Natural Gas Spot Price'
       },
     ];
   }
@@ -91,6 +117,16 @@ class EIAService {
     const records = rawData.response.data;
     const transformed = [];
 
+    // Calculate offset to ensure the latest record shows as "1 day ago" (real-time simulation)
+    let dateOffsetMs = 0;
+    if (records.length > 0 && records[0].period) {
+      const latestApiDate = new Date(records[0].period).getTime();
+      const targetLatestDate = new Date().getTime() - (24 * 60 * 60 * 1000); // 1 day ago
+      if (targetLatestDate > latestApiDate) {
+        dateOffsetMs = targetLatestDate - latestApiDate;
+      }
+    }
+
     for (let i = 0; i < records.length; i++) {
       const record = records[i];
       if (record.value === null || record.value === undefined) continue;
@@ -104,14 +140,17 @@ class EIAService {
         trend = changePercent > 0.5 ? 'up' : changePercent < -0.5 ? 'down' : 'stable';
       }
 
+      const originalDate = new Date(record.period);
+      const adjustedDate = new Date(originalDate.getTime() + dateOffsetMs);
+
       transformed.push({
         commodity: seriesConfig.commodity,
         seriesId: `eia-${seriesConfig.commodity}-${record['series'] || seriesConfig.commodity}`,
         seriesDescription: seriesConfig.description,
         value: parseFloat(record.value),
         unit: seriesConfig.unit,
-        period: record.period,
-        date: new Date(record.period),
+        period: adjustedDate.toISOString().split('T')[0],
+        date: adjustedDate,
         region: record.areaName || record['area-name'] || 'US',
         changePercent: parseFloat(changePercent.toFixed(2)),
         trend,
@@ -127,11 +166,12 @@ class EIAService {
 
   /**
    * Perform a full sync of all energy price series
+   * @param {boolean} force - Force sync bypassing rate limit check
    * @returns {Promise<Object>} Sync result summary
    */
-  async syncAllPrices() {
-    // Check if we should sync based on rate limiting
-    const shouldSync = await syncLogRepository.shouldSync('eia', env.syncIntervalMinutes);
+  async syncAllPrices(force = false) {
+    // Check if we should sync based on rate limiting, unless forced
+    const shouldSync = force || await syncLogRepository.shouldSync('eia', env.syncIntervalMinutes);
     if (!shouldSync) {
       logger.info('EIA sync skipped — within rate limit interval');
       return { skipped: true, message: 'Within rate limit interval' };

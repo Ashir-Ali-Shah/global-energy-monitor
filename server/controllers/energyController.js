@@ -63,7 +63,7 @@ class EnergyController {
   async triggerSync(req, res) {
     try {
       logger.info('Manual EIA sync triggered');
-      const result = await eiaService.syncAllPrices();
+      const result = await eiaService.syncAllPrices(true);
       res.json({ success: true, data: result });
     } catch (error) {
       logger.error(`Manual EIA sync failed: ${error.message}`);

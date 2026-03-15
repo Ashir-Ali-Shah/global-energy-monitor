@@ -117,11 +117,12 @@ class NewsDataService {
 
   /**
    * Perform a full sync of all news queries
+   * @param {boolean} force - Force sync bypassing rate limit check
    * @returns {Promise<Object>} Sync result summary
    */
-  async syncAllNews() {
-    // Check if we should sync based on rate limiting
-    const shouldSync = await syncLogRepository.shouldSync('newsdata', env.syncIntervalMinutes);
+  async syncAllNews(force = false) {
+    // Check if we should sync based on rate limiting, unless forced
+    const shouldSync = force || await syncLogRepository.shouldSync('newsdata', env.syncIntervalMinutes);
     if (!shouldSync) {
       logger.info('NewsData sync skipped — within rate limit interval');
       return { skipped: true, message: 'Within rate limit interval' };

@@ -37,7 +37,7 @@ export default function PriceChart() {
   const selectedMeta = COMMODITIES.find((c) => c.value === selectedCommodity) || COMMODITIES[0];
 
   const chartData = history.map((item) => ({
-    date: new Date(item.date).toLocaleDateString('en-US', { month: 'short', year: '2-digit' }),
+    date: new Date(item.date).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: '2-digit' }),
     price: item.value,
     change: item.changePercent,
   }));
@@ -102,7 +102,8 @@ export default function PriceChart() {
               <YAxis
                 tick={{ fill: '#8884d8', fontSize: 12 }}
                 stroke="#2a2a4a"
-                domain={['auto', 'auto']}
+                domain={['dataMin - (dataMin * 0.05)', 'dataMax + (dataMax * 0.05)']}
+                tickFormatter={(val) => `$${val.toFixed(2)}`}
               />
               <Tooltip content={<CustomTooltip />} />
               <Legend />
