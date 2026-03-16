@@ -1,13 +1,13 @@
 // client/src/components/AlertDetail.jsx
-// Modal/panel showing detailed view of a selected alert
+// Modal/panel showing detailed view of a selected alert — light theme
 
 import { useApp } from '../context/AppContext';
 
 const SEVERITY_COLORS = {
-  critical: '#ff2d55',
-  high: '#ff6b35',
-  medium: '#ffbe0b',
-  low: '#06d6a0',
+  critical: '#d1293d',
+  high: '#c45e2a',
+  medium: '#b5850a',
+  low: '#1a7d5c',
 };
 
 const CATEGORY_ICONS = {
@@ -24,7 +24,20 @@ export default function AlertDetail() {
 
   if (!selectedAlert) return null;
 
-  const { title, description, content, source, sourceUrl, country, category, sentimentScore, severity, keywords, imageUrl, publishedAt } = selectedAlert;
+  const {
+    title,
+    description,
+    content,
+    source,
+    sourceUrl,
+    country,
+    category,
+    sentimentScore,
+    severity,
+    keywords,
+    imageUrl,
+    publishedAt,
+  } = selectedAlert;
 
   return (
     <div className="alert-detail-overlay" onClick={clearSelection} id="alert-detail">
@@ -41,7 +54,13 @@ export default function AlertDetail() {
 
         {imageUrl && (
           <div className="detail-image">
-            <img src={imageUrl} alt={title} onError={(e) => { e.target.style.display = 'none'; }} />
+            <img
+              src={imageUrl}
+              alt={title}
+              onError={(e) => {
+                e.target.style.display = 'none';
+              }}
+            />
           </div>
         )}
 
@@ -49,26 +68,40 @@ export default function AlertDetail() {
 
         <div className="detail-meta">
           <span>📍 {country || 'Unknown'}</span>
-          <span>📅 {publishedAt ? new Date(publishedAt).toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric', year: 'numeric' }) : '—'}</span>
+          <span>
+            📅{' '}
+            {publishedAt
+              ? new Date(publishedAt).toLocaleDateString('en-US', {
+                weekday: 'short',
+                month: 'short',
+                day: 'numeric',
+                year: 'numeric',
+              })
+              : '—'}
+          </span>
           <span>📡 {source}</span>
         </div>
 
         <div className="detail-sentiment">
-          <span className="sentiment-label">Sentiment Analysis:</span>
+          <span className="sentiment-label">Sentiment Analysis</span>
           <div className="sentiment-bar-container">
             <div
               className="sentiment-bar"
               style={{
                 width: `${Math.abs(sentimentScore || 0) * 100}%`,
-                background: (sentimentScore || 0) < 0
-                  ? 'linear-gradient(90deg, #ff2d55, #ff6b35)'
-                  : 'linear-gradient(90deg, #06d6a0, #00b4d8)',
+                background:
+                  (sentimentScore || 0) < 0
+                    ? 'linear-gradient(90deg, #d1293d, #c45e2a)'
+                    : 'linear-gradient(90deg, #1a7d5c, #1a6fa0)',
                 marginLeft: (sentimentScore || 0) < 0 ? 'auto' : '50%',
                 marginRight: (sentimentScore || 0) >= 0 ? 'auto' : '50%',
               }}
             />
           </div>
-          <span className="sentiment-value" style={{ color: (sentimentScore || 0) < 0 ? '#ff2d55' : '#06d6a0' }}>
+          <span
+            className="sentiment-value"
+            style={{ color: (sentimentScore || 0) < 0 ? '#d1293d' : '#1a7d5c' }}
+          >
             {(sentimentScore || 0).toFixed(3)}
           </span>
         </div>
@@ -92,7 +125,9 @@ export default function AlertDetail() {
             <h4>Keywords</h4>
             <div className="keyword-chips">
               {keywords.map((kw, idx) => (
-                <span key={idx} className="keyword-chip">{kw}</span>
+                <span key={idx} className="keyword-chip">
+                  {kw}
+                </span>
               ))}
             </div>
           </div>

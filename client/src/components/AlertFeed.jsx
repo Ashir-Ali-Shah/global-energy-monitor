@@ -1,13 +1,13 @@
 // client/src/components/AlertFeed.jsx
-// Real-time scrollable feed of latest alerts/news
+// Real-time scrollable feed of latest alerts/news — light theme
 
 import { useApp } from '../context/AppContext';
 
 const SEVERITY_COLORS = {
-  critical: '#ff2d55',
-  high: '#ff6b35',
-  medium: '#ffbe0b',
-  low: '#06d6a0',
+  critical: '#d1293d',
+  high: '#c45e2a',
+  medium: '#b5850a',
+  low: '#1a7d5c',
 };
 
 const CATEGORY_ICONS = {
@@ -24,9 +24,8 @@ export default function AlertFeed({ alerts = [], loading }) {
 
   const categories = ['all', 'petroleum', 'natural-gas', 'conflict', 'logistics', 'energy'];
 
-  const filteredAlerts = filterCategory === 'all'
-    ? alerts
-    : alerts.filter((a) => a.category === filterCategory);
+  const filteredAlerts =
+    filterCategory === 'all' ? alerts : alerts.filter((a) => a.category === filterCategory);
 
   const formatTime = (dateStr) => {
     if (!dateStr) return '';
@@ -94,8 +93,12 @@ export default function AlertFeed({ alerts = [], loading }) {
               <h4 className="alert-item-title">{alert.title}</h4>
               <div className="alert-item-meta">
                 <span className="alert-item-country">📍 {alert.country || 'Unknown'}</span>
-                <span className={`alert-item-sentiment ${(alert.sentimentScore || 0) < 0 ? 'negative' : 'positive'}`}>
-                  {(alert.sentimentScore || 0) < 0 ? '😟' : '😊'} {(alert.sentimentScore || 0).toFixed(2)}
+                <span
+                  className={`alert-item-sentiment ${(alert.sentimentScore || 0) < 0 ? 'negative' : 'positive'
+                    }`}
+                >
+                  {(alert.sentimentScore || 0) < 0 ? '😟' : '😊'}{' '}
+                  {(alert.sentimentScore || 0).toFixed(2)}
                 </span>
               </div>
             </div>

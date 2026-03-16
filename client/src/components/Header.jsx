@@ -1,5 +1,5 @@
 // client/src/components/Header.jsx
-// Application header with navigation and branding
+// Application header with navigation and branding — light theme
 
 import SyncIndicator from './SyncIndicator';
 import { useApp } from '../context/AppContext';
@@ -19,7 +19,7 @@ export default function Header() {
           <span className="logo-icon">🌊</span>
           <div className="logo-text">
             <h1>Ripple Effect</h1>
-            <span className="logo-subtitle">Global Energy & Conflict Monitor</span>
+            <span className="logo-subtitle">Global Energy &amp; Conflict Monitor</span>
           </div>
         </div>
       </div>

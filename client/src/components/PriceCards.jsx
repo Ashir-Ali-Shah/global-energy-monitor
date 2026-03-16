@@ -1,15 +1,45 @@
 // client/src/components/PriceCards.jsx
-// Energy price cards showing latest commodity prices with trend indicators
+// Energy price cards showing latest commodity prices — light theme
 
 import { useEnergyPrices } from '../hooks/useEnergyPrices';
 
 const COMMODITY_META = {
-  'crude-oil': { icon: '🛢️', label: 'Crude Oil (WTI)', gradient: 'linear-gradient(135deg, #1a1a2e, #2d1b3d)' },
-  'gasoline': { icon: '⛽', label: 'Gasoline', gradient: 'linear-gradient(135deg, #1a2a1a, #1b3d2d)' },
-  'diesel': { icon: '🏭', label: 'Diesel', gradient: 'linear-gradient(135deg, #2a1a1a, #3d2d1b)' },
-  'heating-oil': { icon: '🔥', label: 'Heating Oil', gradient: 'linear-gradient(135deg, #2a2a1a, #3d361b)' },
-  'natural-gas': { icon: '💨', label: 'Natural Gas', gradient: 'linear-gradient(135deg, #1a2a2a, #1b3d3d)' },
-  'propane': { icon: '🧪', label: 'Propane', gradient: 'linear-gradient(135deg, #1a1a2a, #1b1b3d)' },
+  'crude-oil': {
+    icon: '🛢️',
+    label: 'Crude Oil (WTI)',
+    accent: '#c45e2a',
+    bg: '#fdf6f1',
+  },
+  gasoline: {
+    icon: '⛽',
+    label: 'Gasoline',
+    accent: '#1a7d5c',
+    bg: '#f1faf6',
+  },
+  diesel: {
+    icon: '🏭',
+    label: 'Diesel',
+    accent: '#c45e2a',
+    bg: '#fdf6f1',
+  },
+  'heating-oil': {
+    icon: '🔥',
+    label: 'Heating Oil',
+    accent: '#b5850a',
+    bg: '#fdf9ed',
+  },
+  'natural-gas': {
+    icon: '💨',
+    label: 'Natural Gas',
+    accent: '#1a6fa0',
+    bg: '#f0f7fd',
+  },
+  propane: {
+    icon: '🧪',
+    label: 'Propane',
+    accent: '#6c63ff',
+    bg: '#f5f4ff',
+  },
 };
 
 export default function PriceCards() {
@@ -49,22 +79,27 @@ export default function PriceCards() {
   return (
     <div className="price-cards-grid" id="price-cards">
       {latestPrices.map((price) => {
-        const meta = COMMODITY_META[price._id] || { icon: '📊', label: price._id, gradient: 'linear-gradient(135deg, #1a1a2e, #16213e)' };
+        const meta = COMMODITY_META[price._id] || {
+          icon: '📊',
+          label: price._id,
+          accent: '#6c63ff',
+          bg: '#f5f4ff',
+        };
         const isNegative = price.changePercent < 0;
-        const trendColor = isNegative ? '#ff2d55' : '#06d6a0';
+        const trendColor = isNegative ? '#d1293d' : '#1a7d5c';
         const trendIcon = isNegative ? '▼' : '▲';
 
         return (
           <div
             key={price._id}
             className="price-card"
-            style={{ background: meta.gradient }}
+            style={{ background: meta.bg, borderTopColor: meta.accent, borderTopWidth: 3 }}
           >
             <div className="price-card-header">
               <span className="price-card-icon">{meta.icon}</span>
               <span className="price-card-label">{meta.label}</span>
             </div>
-            <div className="price-card-value">
+            <div className="price-card-value" style={{ color: meta.accent }}>
               ${price.latestPrice?.toFixed(2) || 'N/A'}
               <span className="price-card-unit">{price.unit}</span>
             </div>
@@ -74,7 +109,13 @@ export default function PriceCards() {
               <span className="trend-label">{price.trend || 'stable'}</span>
             </div>
             <div className="price-card-date">
-              {price.date ? new Date(price.date).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }) : '—'}
+              {price.date
+                ? new Date(price.date).toLocaleDateString('en-US', {
+                  month: 'short',
+                  day: 'numeric',
+                  year: 'numeric',
+                })
+                : '—'}
             </div>
           </div>
         );

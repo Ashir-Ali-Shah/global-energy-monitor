@@ -1,5 +1,5 @@
 // client/src/components/SyncIndicator.jsx
-// Shows data sync status and last sync time
+// Shows data sync status and last sync time — light theme
 
 import { useSyncStatus } from '../hooks/useSyncStatus';
 
@@ -24,7 +24,7 @@ export default function SyncIndicator() {
     return (
       <div className="sync-indicator" id="sync-indicator">
         <div className="sync-dot syncing" />
-        <span>Checking sync status...</span>
+        <span style={{ fontSize: '11px', color: 'var(--text-muted)' }}>Checking...</span>
       </div>
     );
   }

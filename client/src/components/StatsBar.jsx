@@ -1,21 +1,27 @@
 // client/src/components/StatsBar.jsx
-// Top statistics bar showing key metrics
+// Top statistics bar showing key metrics — light theme
 
 export default function StatsBar({ alerts = [], stats = [] }) {
   const totalAlerts = alerts.length;
   const criticalCount = alerts.filter((a) => a.severity === 'critical').length;
   const highCount = alerts.filter((a) => a.severity === 'high').length;
-  const avgSentiment = alerts.length > 0
-    ? alerts.reduce((sum, a) => sum + (a.sentimentScore || 0), 0) / alerts.length
-    : 0;
+  const avgSentiment =
+    alerts.length > 0
+      ? alerts.reduce((sum, a) => sum + (a.sentimentScore || 0), 0) / alerts.length
+      : 0;
   const countriesAffected = new Set(alerts.map((a) => a.country)).size;
 
   const metrics = [
     { label: 'Total Alerts', value: totalAlerts, icon: '🔔', color: '#6c63ff' },
-    { label: 'Critical', value: criticalCount, icon: '🔴', color: '#ff2d55' },
-    { label: 'High Priority', value: highCount, icon: '🟠', color: '#ff6b35' },
-    { label: 'Avg Sentiment', value: avgSentiment.toFixed(2), icon: avgSentiment < 0 ? '📉' : '📈', color: avgSentiment < 0 ? '#ff2d55' : '#06d6a0' },
-    { label: 'Countries', value: countriesAffected, icon: '🌍', color: '#ffbe0b' },
+    { label: 'Critical', value: criticalCount, icon: '🔴', color: '#d1293d' },
+    { label: 'High Priority', value: highCount, icon: '🟠', color: '#c45e2a' },
+    {
+      label: 'Avg Sentiment',
+      value: avgSentiment.toFixed(2),
+      icon: avgSentiment < 0 ? '📉' : '📈',
+      color: avgSentiment < 0 ? '#d1293d' : '#1a7d5c',
+    },
+    { label: 'Countries', value: countriesAffected, icon: '🌍', color: '#b5850a' },
   ];
 
   return (

@@ -1,18 +1,23 @@
 // client/src/components/PriceChart.jsx
-// Recharts-based price history chart for selected commodities
+// Recharts-based price history chart — light theme
 
 import { useState } from 'react';
 import {
-  AreaChart, Area, XAxis, YAxis, CartesianGrid,
-  Tooltip, ResponsiveContainer, Legend,
+  AreaChart,
+  Area,
+  XAxis,
+  YAxis,
+  Tooltip,
+  ResponsiveContainer,
+  Legend,
 } from 'recharts';
 import { usePriceHistory } from '../hooks/useEnergyPrices';
 
 const COMMODITIES = [
-  { value: 'crude-oil', label: 'Crude Oil (WTI)', color: '#6c63ff' },
-  { value: 'gasoline', label: 'Gasoline', color: '#06d6a0' },
-  { value: 'diesel', label: 'Diesel', color: '#ff6b35' },
-  { value: 'natural-gas', label: 'Natural Gas', color: '#ffbe0b' },
+  { value: 'crude-oil', label: 'Crude Oil (WTI)', color: '#c45e2a' },
+  { value: 'gasoline', label: 'Gasoline', color: '#1a7d5c' },
+  { value: 'diesel', label: 'Diesel', color: '#b5850a' },
+  { value: 'natural-gas', label: 'Natural Gas', color: '#1a6fa0' },
 ];
 
 function CustomTooltip({ active, payload, label }) {
@@ -34,10 +39,15 @@ export default function PriceChart() {
   const [months, setMonths] = useState(12);
   const { history, loading } = usePriceHistory(selectedCommodity, months);
 
-  const selectedMeta = COMMODITIES.find((c) => c.value === selectedCommodity) || COMMODITIES[0];
+  const selectedMeta =
+    COMMODITIES.find((c) => c.value === selectedCommodity) || COMMODITIES[0];
 
   const chartData = history.map((item) => ({
-    date: new Date(item.date).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: '2-digit' }),
+    date: new Date(item.date).toLocaleDateString('en-US', {
+      month: 'short',
+      day: 'numeric',
+      year: '2-digit',
+    }),
     price: item.value,
     change: item.changePercent,
   }));
@@ -53,7 +63,11 @@ export default function PriceChart() {
                 key={c.value}
                 className={`commodity-btn ${selectedCommodity === c.value ? 'active' : ''}`}
                 onClick={() => setSelectedCommodity(c.value)}
-                style={selectedCommodity === c.value ? { borderColor: c.color, color: c.color } : {}}
+                style={
+                  selectedCommodity === c.value
+                    ? { color: c.color, borderColor: `${c.color}40`, background: `${c.color}10` }
+                    : {}
+                }
               >
                 {c.label}
               </button>
@@ -86,27 +100,38 @@ export default function PriceChart() {
           </div>
         ) : (
           <ResponsiveContainer width="100%" height={350}>
-            <AreaChart data={chartData} margin={{ top: 10, right: 30, left: 10, bottom: 0 }}>
+            <AreaChart
+              data={chartData}
+              margin={{ top: 10, right: 30, left: 10, bottom: 0 }}
+            >
               <defs>
                 <linearGradient id="priceGradient" x1="0" y1="0" x2="0" y2="1">
-                  <stop offset="5%" stopColor={selectedMeta.color} stopOpacity={0.4} />
+                  <stop offset="5%" stopColor={selectedMeta.color} stopOpacity={0.18} />
                   <stop offset="95%" stopColor={selectedMeta.color} stopOpacity={0} />
                 </linearGradient>
               </defs>
-              <CartesianGrid strokeDasharray="3 3" stroke="#2a2a4a" />
               <XAxis
                 dataKey="date"
-                tick={{ fill: '#8884d8', fontSize: 12 }}
-                stroke="#2a2a4a"
+                tick={{ fill: '#9c9690', fontSize: 11, fontFamily: 'DM Mono' }}
+                stroke="#e8e2d8"
+                minTickGap={40}
+                tickLine={false}
               />
               <YAxis
-                tick={{ fill: '#8884d8', fontSize: 12 }}
-                stroke="#2a2a4a"
-                domain={['dataMin - (dataMin * 0.05)', 'dataMax + (dataMax * 0.05)']}
+                tick={{ fill: '#9c9690', fontSize: 11, fontFamily: 'DM Mono' }}
+                stroke="transparent"
+                domain={[
+                  'dataMin - (dataMin * 0.05)',
+                  'dataMax + (dataMax * 0.05)',
+                ]}
                 tickFormatter={(val) => `$${val.toFixed(2)}`}
+                tickLine={false}
+                axisLine={false}
               />
               <Tooltip content={<CustomTooltip />} />
-              <Legend />
+              <Legend
+                wrapperStyle={{ fontSize: '12px', fontFamily: 'Sora' }}
+              />
               <Area
                 type="monotone"
                 dataKey="price"
@@ -115,7 +140,7 @@ export default function PriceChart() {
                 fill="url(#priceGradient)"
                 strokeWidth={2}
                 dot={false}
-                activeDot={{ r: 6, stroke: selectedMeta.color, fill: '#fff' }}
+                activeDot={{ r: 5, stroke: selectedMeta.color, fill: '#fff', strokeWidth: 2 }}
               />
             </AreaChart>
           </ResponsiveContainer>
